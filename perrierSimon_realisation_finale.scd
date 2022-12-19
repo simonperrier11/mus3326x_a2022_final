@@ -36,49 +36,49 @@ Buffer.freeAll;
 (
 SynthDef.new(\kick, {
 	arg out = 0, pan = 0, amp = 0.7, lowFreqMidpoint = 150; // On rend se dernier paramètre modulable pour faire varier légèrement le timbre du kick
-    	var sig, low, lowFreqEnv, lowAmpEnv, mid, midFreqEnv, midAmpEnv;
+	var sig, low, lowFreqEnv, lowAmpEnv, mid, midFreqEnv, midAmpEnv;
 
 	// Corps principal du kick : Frequence part dans les moyennes frequences, puis
 	// descent dans les basses fréquences (decay)
-    	lowFreqEnv = EnvGen.ar(Env([250, lowFreqMidpoint, 50], [0.03, 0.1], curve: \exp));
-    	lowAmpEnv = EnvGen.ar(Env.linen(0.005, 0.1, 0.3), doneAction: 2);
-    	low = SinOsc.ar(lowFreqEnv) * lowAmpEnv;
+	lowFreqEnv = EnvGen.ar(Env([250, lowFreqMidpoint, 50], [0.03, 0.1], curve: \exp));
+	lowAmpEnv = EnvGen.ar(Env.linen(0.005, 0.1, 0.3), doneAction: 2);
+	low = SinOsc.ar(lowFreqEnv) * lowAmpEnv;
 
 	// Ajout d'une composante dans les moyennes fréquences qui "pop" un peu plus
-    	midFreqEnv = EnvGen.ar(Env([800, 240], [0.02], curve: \exp));
-    	midAmpEnv = EnvGen.ar(Env.linen(0.001, 0.02, 0.001));
-    	mid = SinOsc.ar(midFreqEnv) * midAmpEnv;
+	midFreqEnv = EnvGen.ar(Env([800, 240], [0.02], curve: \exp));
+	midAmpEnv = EnvGen.ar(Env.linen(0.001, 0.02, 0.001));
+	mid = SinOsc.ar(midFreqEnv) * midAmpEnv;
 
 	// Addition des deux et "lissage" avec tanh : donne moins l'impression que les
 	// sons sont superposés, et plus qu'ils sont fusionnés
 	sig = low + mid;
-    	sig = sig.tanh;
+	sig = sig.tanh;
 
 	sig = Pan2.ar(sig, pan, amp + 0.25);
 
-    	Out.ar(out, sig);
+	Out.ar(out, sig);
 }).add;
 
 // Snare drum
 SynthDef.new(\snare, {
-    	arg out = 0, pan = 0, amp = 0.8, noiseEnvRel = 0.3, hitStartFreq = 3000, hitMidFreq = 600, hitEndFreq = 150;
-    	var sig, hit, hitAmpEnv, hitFreqEnv, noise, noiseAmpEnv;
+	arg out = 0, pan = 0, amp = 0.8, noiseEnvRel = 0.3, hitStartFreq = 3000, hitMidFreq = 600, hitEndFreq = 150;
+	var sig, hit, hitAmpEnv, hitFreqEnv, noise, noiseAmpEnv;
 
-    	// Corps principal du snare : Une fréquence qui débute très haut, puis descent
+	// Corps principal du snare : Une fréquence qui débute très haut, puis descent
 	// rapidement vers les moyennes-basses fréquences
-    	hitFreqEnv = EnvGen.ar(Env([hitStartFreq, hitMidFreq, hitEndFreq], [0.005, 0.01], curve: \exp));
-    	hitAmpEnv = EnvGen.ar(Env.perc(0.01, 0.08));
-    	hit = SinOsc.ar(hitFreqEnv) * hitAmpEnv;
+	hitFreqEnv = EnvGen.ar(Env([hitStartFreq, hitMidFreq, hitEndFreq], [0.005, 0.01], curve: \exp));
+	hitAmpEnv = EnvGen.ar(Env.perc(0.01, 0.08));
+	hit = SinOsc.ar(hitFreqEnv) * hitAmpEnv;
 
 	// Ajout d'un noise pour avoir vraiment notre son de snare
-    	noiseAmpEnv = EnvGen.ar(Env.perc(0.001, noiseEnvRel), doneAction: 2);
+	noiseAmpEnv = EnvGen.ar(Env.perc(0.001, noiseEnvRel), doneAction: 2);
 	noise = BPF.ar(WhiteNoise.ar, 900, 1.5) * noiseAmpEnv;
 
-    	sig = hit + noise;
+	sig = hit + noise;
 
 	sig = Pan2.ar(sig, pan, amp + 0.5);
 
-    	Out.ar(out, sig);
+	Out.ar(out, sig);
 }).add;
 
 // Hi hat
